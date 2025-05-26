@@ -1,3 +1,4 @@
+# backend/config/settings.py
 import os
 from dotenv import load_dotenv
 
@@ -17,7 +18,7 @@ class Config:
 class DevelopmentConfig(Config):
     """Configuración para entorno de desarrollo"""
     DEBUG = True
-    SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URI', 'sqlite:///ecommerce.db')
+    SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URI', 'sqlite:///instance/ecommerce.db')
     JWT_ACCESS_TOKEN_EXPIRES = False  # Tokens sin expiración en desarrollo
 
 class ProductionConfig(Config):
