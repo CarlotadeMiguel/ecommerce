@@ -28,5 +28,6 @@ class Product(db.Model):
             'price': float(self.price),
             'stock': self.stock,
             'category': self.category,
-            'image_url': self.image_url
+            'image_url': self.image_url,
+            'is_active': self.is_active 
         }
