@@ -17,6 +17,9 @@ def create_app():
     # Inicializar extensiones
     db.init_app(app)
     migrate.init_app(app, db)
+ 
+    # Importar modelos para registrar mapeos
+    from backend.models import User, Product, Order, OrderItem
     
     # Registrar blueprints
     from backend.api.auth import auth_bp
