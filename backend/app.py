@@ -2,10 +2,11 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
-
+from flask_jwt_extended import JWTManager
 
 db = SQLAlchemy()
 migrate = Migrate()
+jwt = JWTManager()
 
 def create_app():
     app = Flask(__name__)
@@ -17,10 +18,17 @@ def create_app():
     # Inicializar extensiones
     db.init_app(app)
     migrate.init_app(app, db)
+    jwt.init_app(app)
  
     # Importar modelos para registrar mapeos
     from backend.models import User, Product, Order, OrderItem
     
+    # Añadir claims personalizados al JWT
+    @jwt.additional_claims_loader
+    def add_claims_to_jwt(identity):
+        user = User.query.get(identity)
+        return {"role": user.role}
+
     # Registrar blueprints
     from backend.api.auth import auth_bp
     from backend.api.products import products_bp
