@@ -23,8 +23,12 @@ def create_app():
     
     # Registrar blueprints
     from backend.api.auth import auth_bp
+    from backend.api.products import products_bp
+    from backend.api.orders import orders_bp
     app.register_blueprint(auth_bp, url_prefix='/api/auth')
-    
+    app.register_blueprint(products_bp, url_prefix='/api/products')
+    app.register_blueprint(orders_bp, url_prefix='/api/orders')
+        
     return app
 
 app = create_app()
