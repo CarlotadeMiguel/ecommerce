@@ -1,20 +1,27 @@
+# backend/app.py
 from flask import Flask
-from config.settings import get_config
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 
 
+db = SQLAlchemy()
+migrate = Migrate()
+
 def create_app():
     app = Flask(__name__)
     
-    # Cargar configuración
-    config = get_config()
-    app.config.from_object(config)
-
-    db = SQLAlchemy(app)
-    migrate = Migrate(app, db)
+    # Configuración desde settings.py
+    from backend.config.settings import DevelopmentConfig
+    app.config.from_object(DevelopmentConfig)
     
-    # Inicializar extensiones y blueprints aquí
+    # Inicializar extensiones
+    db.init_app(app)
+    migrate.init_app(app, db)
+    
+    # Registrar blueprints
+    from backend.api.auth import auth_bp
+    app.register_blueprint(auth_bp, url_prefix='/api/auth')
+    
     return app
 
 app = create_app()
