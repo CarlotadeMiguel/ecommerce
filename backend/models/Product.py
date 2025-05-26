@@ -1,6 +1,5 @@
-# models/Product.py
-
-from backend import db
+# backend/models/Product.py
+from backend.app import db 
 
 class Product(db.Model):
     __tablename__ = 'products'

@@ -1,6 +1,6 @@
-# models/Order.py
+# backend/models/Order.py
 
-from backend import db
+from backend.app import db 
 from sqlalchemy.ext.hybrid import hybrid_property
 
 class Order(db.Model):
