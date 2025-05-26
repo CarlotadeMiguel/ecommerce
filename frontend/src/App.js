@@ -3,22 +3,10 @@ import './App.css';
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <div class="bg-white p-8 rounded-lg shadow-lg max-w-md text-center">
+    <h1 class="text-3xl font-bold mb-4 text-blue-600">¡Hola, Tailwind!</h1>
+    <p class="text-gray-700 mb-6">Este es un ejemplo básico</p>
+  </div>
   );
 }
 
