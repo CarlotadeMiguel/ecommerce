@@ -1,6 +1,7 @@
 # backend/api/auth.py
 
 from flask import Blueprint, jsonify, request
+from flask_jwt_extended import create_access_token
 from backend.models import User, Product, Order, OrderItem
 from backend.app import db
 
@@ -34,3 +35,37 @@ def register():
     except Exception as e:
         db.session.rollback()
         return jsonify({'error': 'Error al crear usuario'}), 500
+
+
+@auth_bp.route('/login', methods=['POST'])
+def login():
+    data = request.get_json()
+    email = data.get('email', '').strip().lower()
+    password = data.get('password', '')
+
+    if not email or not password:
+        return jsonify({'error': 'Email y contraseña son requeridos'}), 400
+
+    user = User.query.filter_by(email=email).first()
+    if not user or not user.verify_password(password):
+        return jsonify({'error': 'Credenciales inválidas'}), 401
+
+    access_token = create_access_token(identity=user.id)
+
+    response = jsonify({
+        'message': 'Login exitoso',
+        'user': user.to_dict(),
+        'accessToken': access_token
+    })
+
+    # Configurar la cookie con el token de acceso
+    response.set_cookie(
+        'access_token_cookie',
+        access_token,
+        max_age=24*60*60,  # 24 horas
+        httponly=True,
+        secure=False,      # Cambia a True en producción con HTTPS
+        samesite='Lax'
+    )
+
+    return response, 200
