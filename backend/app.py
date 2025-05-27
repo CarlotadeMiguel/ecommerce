@@ -1,8 +1,9 @@
 # backend/app.py
-from flask import Flask
+from flask import Flask,jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_jwt_extended import JWTManager
+from flask_cors import CORS
 
 db = SQLAlchemy()
 migrate = Migrate()
@@ -38,7 +39,15 @@ def create_app():
     app.register_blueprint(products_bp, url_prefix='/api/products')
     app.register_blueprint(orders_bp, url_prefix='/api/orders')
     app.register_blueprint(cart_bp, url_prefix='/api/cart')
-    
+ 
+    CORS(
+        app,
+        origins=["http://localhost:3000"],
+        supports_credentials=True,
+        allow_headers=["Authorization", "Content-Type"],
+        methods=["GET", "POST", "PUT", "DELETE"]
+    )
+
     return app
 
 app = create_app()
