@@ -19,6 +19,7 @@ class DevelopmentConfig(Config):
     """Configuración para entorno de desarrollo"""
     DEBUG = True
     SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URI', 'sqlite:///instance/ecommerce.db')
+    CORS_ORIGINS = os.getenv('CORS_ORIGINS', 'http://localhost:3000').split(',')
     JWT_ACCESS_TOKEN_EXPIRES = False  # Tokens sin expiración en desarrollo
     RESTX_JSON = {'ensure_ascii': False}
     RESTX_MASK_SWAGGER = False
