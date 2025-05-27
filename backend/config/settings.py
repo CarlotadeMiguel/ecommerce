@@ -20,6 +20,10 @@ class DevelopmentConfig(Config):
     DEBUG = True
     SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URI', 'sqlite:///instance/ecommerce.db')
     JWT_ACCESS_TOKEN_EXPIRES = False  # Tokens sin expiración en desarrollo
+    RESTX_JSON = {'ensure_ascii': False}
+    RESTX_MASK_SWAGGER = False
+    PAGE_SIZE = 10
+    MAX_PAGE_SIZE = 100
 
 class ProductionConfig(Config):
     """Configuración para entorno de producción"""
