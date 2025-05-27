@@ -31,7 +31,14 @@ def register():
         user.password = password  # setter encripta y valida
         db.session.add(user)
         db.session.commit()
-        return jsonify({'user': user.to_dict()}), 201
+
+        # Crear el access_token para el nuevo usuario
+        access_token = create_access_token(identity=user.id)
+        return jsonify({
+            'user': user.to_dict(),
+            'accessToken': access_token
+        }), 201
+    
     except Exception as e:
         db.session.rollback()
         return jsonify({'error': 'Error al crear usuario'}), 500
