@@ -15,7 +15,8 @@ def paginate_query(query, page, limit):
         "page": pagination.page,
         "per_page": pagination.per_page,
         "total": pagination.total,
-        "pages": pagination.pages
+        "pages": pagination.pages,
+        'current_page': pagination.page
     }
 
 @products_bp.route('/', methods=['GET'])
@@ -23,7 +24,7 @@ def list_products():
     try:
         # Validar y obtener parámetros
         max_price = request.args.get('max_price', type=float)
-        page = request.args.get('page', default=1, type=int)
+        page = request.args.get('page', 1, type=int)
         limit = request.args.get('limit', default=10, type=int)
         if page < 1 or limit < 1:
             return jsonify({"error": "Parámetros de paginación inválidos"}), 400
