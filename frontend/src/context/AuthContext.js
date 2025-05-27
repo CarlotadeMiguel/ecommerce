@@ -1,34 +1,50 @@
 //src/context/AuthContext.js
-import React, { createContext, useState, useEffect } from "react";
-import { login as loginApi, register as registerApi, logout as logoutApi } from "../services/auth";
+import React, { createContext, useState, useEffect, useContext } from 'react';
+import api from '../services/api';
 
-export const AuthContext = createContext();
+const AuthContext = createContext();
 
-export function AuthProvider({ children }) {
+export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Aquí podrías validar el token con un endpoint como /auth/me
+    const checkAuth = async () => {
+      try {
+        const { data } = await api.get('/auth/me');
+        setUser(data.user);
+      } catch (error) {
+        setUser(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+    checkAuth();
   }, []);
 
   const login = async (credentials) => {
-    const data = await loginApi(credentials);
+    const { data } = await api.post('/auth/login', credentials);
     setUser(data.user);
+    localStorage.setItem('accessToken', data.accessToken);
   };
 
-  const register = async (info) => {
-    const data = await registerApi(info);
+  const register = async (userData) => {
+    const { data } = await api.post('/auth/register', userData);
     setUser(data.user);
+    localStorage.setItem('accessToken', data.accessToken);
   };
 
   const logout = async () => {
-    await logoutApi();
+    await api.post('/auth/logout');
     setUser(null);
+    localStorage.removeItem('accessToken');
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, register, logout }}>
+    <AuthContext.Provider value={{ user, loading, login, register, logout }}>
       {children}
     </AuthContext.Provider>
   );
-}
+};
+
+export const useAuth = () => useContext(AuthContext);
