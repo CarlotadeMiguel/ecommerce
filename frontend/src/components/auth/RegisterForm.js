@@ -1,7 +1,7 @@
 // src/components/auth/RegisterForm.jsx
 import React, { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 
 const RegisterForm = () => {
   const [formData, setFormData] = useState({
@@ -74,72 +74,78 @@ const RegisterForm = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="max-w-md mx-auto">
-      {errors.general && <div className="text-red-600 mb-4">{errors.general}</div>}
+    <>
+      <form onSubmit={handleSubmit} className="max-w-md mx-auto">
+        {errors.general && <div className="text-red-600 mb-4">{errors.general}</div>}
 
-      <div className="mb-4">
-        <label className="block mb-1 font-medium">Nombre</label>
-        <input
-          type="text"
-          name="name"
-          className={`w-full p-2 border rounded ${errors.name ? 'border-red-500' : 'border-gray-300'}`}
-          value={formData.name}
-          onChange={handleChange}
-          autoComplete="name"
-        />
-        {errors.name && <span className="text-red-500 text-sm">{errors.name}</span>}
+        <div className="mb-4">
+          <label className="block mb-1 font-medium">Nombre</label>
+          <input
+            type="text"
+            name="name"
+            className={`w-full p-2 border rounded ${errors.name ? 'border-red-500' : 'border-gray-300'}`}
+            value={formData.name}
+            onChange={handleChange}
+            autoComplete="name"
+          />
+          {errors.name && <span className="text-red-500 text-sm">{errors.name}</span>}
+        </div>
+
+        <div className="mb-4">
+          <label className="block mb-1 font-medium">Email</label>
+          <input
+            type="email"
+            name="email"
+            className={`w-full p-2 border rounded ${errors.email ? 'border-red-500' : 'border-gray-300'}`}
+            value={formData.email}
+            onChange={handleChange}
+            autoComplete="email"
+          />
+          {errors.email && <span className="text-red-500 text-sm">{errors.email}</span>}
+        </div>
+
+        <div className="mb-4">
+          <label className="block mb-1 font-medium">Contraseña</label>
+          <input
+            type="password"
+            name="password"
+            className={`w-full p-2 border rounded ${errors.password ? 'border-red-500' : 'border-gray-300'}`}
+            value={formData.password}
+            onChange={handleChange}
+            autoComplete="new-password"
+          />
+          {errors.password && <span className="text-red-500 text-sm">{errors.password}</span>}
+          <span className="text-xs text-gray-500 block mt-1">
+            Mínimo 8 caracteres, una mayúscula, un número y un símbolo.
+          </span>
+        </div>
+
+        <div className="mb-6">
+          <label className="block mb-1 font-medium">Confirmar contraseña</label>
+          <input
+            type="password"
+            name="confirmPassword"
+            className={`w-full p-2 border rounded ${errors.confirmPassword ? 'border-red-500' : 'border-gray-300'}`}
+            value={formData.confirmPassword}
+            onChange={handleChange}
+            autoComplete="new-password"
+          />
+          {errors.confirmPassword && <span className="text-red-500 text-sm">{errors.confirmPassword}</span>}
+        </div>
+
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full bg-green-600 text-white p-2 rounded hover:bg-green-700 transition-colors disabled:opacity-60"
+        >
+          {loading ? 'Registrando...' : 'Registrarse'}
+        </button>
+      </form>
+
+      <div className="mt-4 text-center">
+        <p className="text-gray-600">¿Ya tienes cuenta? <Link to="/login" className="text-blue-600 hover:underline">Inicia sesión</Link></p>
       </div>
-
-      <div className="mb-4">
-        <label className="block mb-1 font-medium">Email</label>
-        <input
-          type="email"
-          name="email"
-          className={`w-full p-2 border rounded ${errors.email ? 'border-red-500' : 'border-gray-300'}`}
-          value={formData.email}
-          onChange={handleChange}
-          autoComplete="email"
-        />
-        {errors.email && <span className="text-red-500 text-sm">{errors.email}</span>}
-      </div>
-
-      <div className="mb-4">
-        <label className="block mb-1 font-medium">Contraseña</label>
-        <input
-          type="password"
-          name="password"
-          className={`w-full p-2 border rounded ${errors.password ? 'border-red-500' : 'border-gray-300'}`}
-          value={formData.password}
-          onChange={handleChange}
-          autoComplete="new-password"
-        />
-        {errors.password && <span className="text-red-500 text-sm">{errors.password}</span>}
-        <span className="text-xs text-gray-500 block mt-1">
-          Mínimo 8 caracteres, una mayúscula, un número y un símbolo.
-        </span>
-      </div>
-
-      <div className="mb-6">
-        <label className="block mb-1 font-medium">Confirmar contraseña</label>
-        <input
-          type="password"
-          name="confirmPassword"
-          className={`w-full p-2 border rounded ${errors.confirmPassword ? 'border-red-500' : 'border-gray-300'}`}
-          value={formData.confirmPassword}
-          onChange={handleChange}
-          autoComplete="new-password"
-        />
-        {errors.confirmPassword && <span className="text-red-500 text-sm">{errors.confirmPassword}</span>}
-      </div>
-
-      <button
-        type="submit"
-        disabled={loading}
-        className="w-full bg-green-600 text-white p-2 rounded hover:bg-green-700 transition-colors disabled:opacity-60"
-      >
-        {loading ? 'Registrando...' : 'Registrarse'}
-      </button>
-    </form>
+    </>
   );
 };
 
