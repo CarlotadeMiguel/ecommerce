@@ -1,4 +1,6 @@
 # models/Cart.py
+from backend.app import db 
+
 class Cart(db.Model):
     __tablename__ = 'carts'
     id = db.Column(db.Integer, primary_key=True)
