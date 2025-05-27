@@ -8,12 +8,9 @@ export function CartProvider({ children }) {
   const [cart, setCart] = useState([]);
 
   const addItem = async (product_id, quantity) => {
-    await addToCart(product_id, quantity);
-    const res = await getCart();
-    setCart(res.data.items);
+    console.log('Funcionalidad en desarrollo: añadir al carrito', product_id, quantity);
   };
 
-  // Puedes añadir métodos para update/remove
 
   return (
     <CartContext.Provider value={{ cart, addItem }}>
