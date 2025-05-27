@@ -21,7 +21,7 @@ def create_app():
     jwt.init_app(app)
  
     # Importar modelos para registrar mapeos
-    from backend.models import User, Product, Order, OrderItem
+    from backend.models import User, Product, Order, OrderItem, Cart, CartItem
     
     # Añadir claims personalizados al JWT
     @jwt.additional_claims_loader
@@ -33,10 +33,12 @@ def create_app():
     from backend.api.auth import auth_bp
     from backend.api.products import products_bp
     from backend.api.orders import orders_bp
+    from backend.api.cart import cart_bp
     app.register_blueprint(auth_bp, url_prefix='/api/auth')
     app.register_blueprint(products_bp, url_prefix='/api/products')
     app.register_blueprint(orders_bp, url_prefix='/api/orders')
-        
+    app.register_blueprint(cart_bp, url_prefix='/api/cart')
+    
     return app
 
 app = create_app()
