@@ -8,7 +8,7 @@ const Header = () => {
   const { user, logout } = useAuth();
   const { cart } = React.useContext(CartContext);
   const navigate = useNavigate();
-
+  const itemCount = cart.reduce((sum, item) => sum + item.quantity, 0);
   const handleLogout = async () => {
     await logout();
     navigate("/login");
@@ -37,7 +37,7 @@ const Header = () => {
             </svg>
             {cart.length > 0 && (
               <span className="absolute -top-2 -right-2 bg-blue-600 text-white text-xs rounded-full px-1.5">
-                {cart.length}
+                {itemCount}
               </span>
             )}
           </Link>
