@@ -1,24 +1,48 @@
 // src/pages/CartPage.js
 import React, { useContext } from "react";
 import { CartContext } from "../context/CartContext";
+import { createOrder } from "../services/orders";
+import CartItem from "../components/cart/CartItem";
+import CartSummary from "../components/cart/CartSummary";
 
 const CartPage = () => {
-  const { cartItems } = useContext(CartContext);
+  const { cart, removeItem, updateQuantity, subtotal, iva, total, clearCart } = useContext(CartContext);
+
+  const handleCheckout = async () => {
+    try {
+      const orderData = {
+        items: cart.map(item => ({
+          product_id: item.product_id,
+          quantity: item.quantity
+        }))
+      };
+      await createOrder(orderData);
+      clearCart();
+    } catch (error) {
+      alert('Error al procesar la orden');
+    }
+  };
 
   return (
-    <div className="container mx-auto py-8">
-      <h2 className="text-2xl font-bold mb-6">Carrito de compras</h2>
-      {cartItems.length === 0 ? (
-        <p>Tu carrito está vacío.</p>
-      ) : (
-        <ul>
-          {cartItems.map((item) => (
-            <li key={item.product_id || item.id}>
-              Producto: {item.product_id || item.id} | Cantidad: {item.quantity}
-            </li>
-          ))}
-        </ul>
-      )}
+    <div className="container mx-auto py-8 flex flex-col md:flex-row gap-8">
+      <div className="flex-1">
+        <h2 className="text-2xl font-bold mb-4">Carrito de compras</h2>
+        {cart.length === 0 ? (
+          <p>Tu carrito está vacío.</p>
+        ) : (
+          cart.map(item => (
+            <CartItem
+              key={item.product_id}
+              item={item}
+              onRemove={removeItem}
+              onUpdate={updateQuantity}
+            />
+          ))
+        )}
+      </div>
+      <div className="w-full md:w-1/3">
+        <CartSummary subtotal={subtotal} iva={iva} total={total} onCheckout={handleCheckout} />
+      </div>
     </div>
   );
 };

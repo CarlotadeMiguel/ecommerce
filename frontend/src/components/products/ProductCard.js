@@ -13,7 +13,12 @@ const ProductCard = ({ product }) => {
       navigate("/login");
       return;
     }
-    addItem(product.id, 1);
+    // Pasar los datos del producto al contexto
+    addItem(product.id, 1, {
+      name: product.name,
+      price: product.price,
+      image_url: product.image_url
+    });
   };
 
   return (
