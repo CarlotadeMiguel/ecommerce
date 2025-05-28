@@ -12,7 +12,7 @@ class Order(db.Model):
     total = db.Column(db.Numeric(10,2))
     status = db.Column(db.String(20), default='pending')
     created_at = db.Column(db.DateTime, default=db.func.current_timestamp())
-    items = db.relationship('OrderItem', backref='order', lazy=True)
+    items = db.relationship('OrderItem', backref='order', lazy=True, cascade='all, delete-orphan')
 
     STATUSES = ['pending', 'confirmed', 'shipped', 'delivered', 'cancelled']
 
