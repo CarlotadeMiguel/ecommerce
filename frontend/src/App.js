@@ -5,6 +5,7 @@ import PrivateRoute from "./components/auth/PrivateRoute";
 import ProductsPage from "./pages/ProductsPage";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
+import CartPage from "./pages/CartPage";
 
 function App() {
   return (
@@ -12,13 +13,14 @@ function App() {
       <CartProvider>
         <Routes>
           {/* Rutas públicas */}
+          <Route path="/" element={<ProductsPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
           
           {/* Rutas protegidas */}
           <Route path="/" element={
             <PrivateRoute>
-              <ProductsPage />
+              <CartPage />
             </PrivateRoute>
           } />
           

@@ -1,4 +1,4 @@
-//src/context/AuthContext.js
+// src/context/AuthContext.js
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import api from '../services/api';
 
@@ -10,11 +10,18 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     const checkAuth = async () => {
+      const token = localStorage.getItem('accessToken');
+      if (!token) {
+        setUser(null);
+        setLoading(false);
+        return;
+      }
       try {
         const { data } = await api.get('/auth/me');
         setUser(data.user);
       } catch (error) {
         setUser(null);
+        localStorage.removeItem('accessToken');
       } finally {
         setLoading(false);
       }

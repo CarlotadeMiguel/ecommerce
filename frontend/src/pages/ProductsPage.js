@@ -1,28 +1,28 @@
-// src/pages/ProductsPage.js
 import React, { useEffect, useState } from 'react';
 import { getProducts } from '../services/products';
 import ProductList from '../components/products/ProductList';
+import { useAuth } from "../context/AuthContext";
+import { useNavigate } from "react-router-dom"; 
 
 function ProductsPage() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [page] = useState(1);
+  const { user } = useAuth();
+  const navigate = useNavigate(); 
 
   useEffect(() => {
     setLoading(true);
-    getProducts({ page, limit: 12 })
+    getProducts({ page: 1, limit: 12 })
       .then(res => {
-        if (res.data?.products) {
-          setProducts(res.data.products);
-        }
+        if (res.data?.products) setProducts(res.data.products);
+        setLoading(false);
       })
       .catch(error => {
-        console.error('Error loading products:', error);
-      })
-      .finally(() => {
+        console.error(error);
         setLoading(false);
       });
-  }, [page]);
+  }, []);
 
   if (loading) {
     return (
@@ -34,7 +34,6 @@ function ProductsPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
       <div className="bg-white shadow-sm border-b">
         <div className="container mx-auto px-4 py-6">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
@@ -45,8 +44,6 @@ function ProductsPage() {
           </p>
         </div>
       </div>
-
-      {/* Lista de productos */}
       <ProductList products={products} />
     </div>
   );
