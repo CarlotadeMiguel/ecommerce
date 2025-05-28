@@ -7,12 +7,14 @@ import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import CartPage from "./pages/CartPage";
 import Header from "./components/common/Header";
+import MiniCart from "./components/cart/MiniCart";
 
 function App() {
   return (
     <Router>
       <CartProvider>
       <Header />
+      <MiniCart />
         <Routes>
           {/* Rutas públicas */}
           <Route path="/" element={<ProductsPage />} />
@@ -20,7 +22,7 @@ function App() {
           <Route path="/register" element={<RegisterPage />} />
           
           {/* Rutas protegidas */}
-          <Route path="/" element={
+          <Route path="/cart" element={
             <PrivateRoute>
               <CartPage />
             </PrivateRoute>
