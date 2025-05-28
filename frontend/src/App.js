@@ -6,11 +6,13 @@ import ProductsPage from "./pages/ProductsPage";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import CartPage from "./pages/CartPage";
+import Header from "./components/common/Header";
 
 function App() {
   return (
     <Router>
       <CartProvider>
+      <Header />
         <Routes>
           {/* Rutas públicas */}
           <Route path="/" element={<ProductsPage />} />
