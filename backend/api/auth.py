@@ -1,9 +1,10 @@
 # backend/api/auth.py
 
 from flask import Blueprint, jsonify, request
-from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
+from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity, get_jwt
 from backend.models import User, Product, Order, OrderItem
 from backend.app import db
+from backend.blocklist import BLOCKLIST
 
 auth_bp = Blueprint('auth', __name__)
 
@@ -85,3 +86,10 @@ def get_current_user():
     if not user:
         return jsonify({'error': 'Usuario no encontrado'}), 404
     return jsonify({'user': user.to_dict()}), 200
+
+@auth_bp.route('/logout', methods=['POST'])
+@jwt_required()
+def logout():
+    jti = get_jwt()["jti"]  # JWT ID, único para cada token
+    BLOCKLIST.add(jti)
+    return jsonify({"msg": "Logout exitoso"}), 200
