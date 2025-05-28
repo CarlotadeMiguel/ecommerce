@@ -2,14 +2,14 @@ import React, { useEffect, useState } from 'react';
 import { getProducts } from '../services/products';
 import ProductList from '../components/products/ProductList';
 import { useAuth } from "../context/AuthContext";
-import { useNavigate } from "react-router-dom"; 
+import { useNavigate } from "react-router-dom";
 
 function ProductsPage() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [page] = useState(1);
   const { user } = useAuth();
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
 
   useEffect(() => {
     setLoading(true);
@@ -44,7 +44,16 @@ function ProductsPage() {
           </p>
         </div>
       </div>
-      <ProductList products={products} />
+
+      <div>
+        {!user && (
+          <div className="login-prompt">
+            <p>Inicia sesión para añadir productos al carrito y comprar.</p>
+            <button onClick={() => navigate("/login")}>Iniciar sesión</button>
+          </div>
+        )}
+        <ProductList products={products} />
+      </div>
     </div>
   );
 }
