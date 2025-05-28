@@ -1,7 +1,7 @@
 # backend/api/auth.py
 
 from flask import Blueprint, jsonify, request
-from flask_jwt_extended import create_access_token
+from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 from backend.models import User, Product, Order, OrderItem
 from backend.app import db
 
@@ -33,7 +33,7 @@ def register():
         db.session.commit()
 
         # Crear el access_token para el nuevo usuario
-        access_token = create_access_token(identity=user.id)
+        access_token = create_access_token(identity=str(user.id))
         return jsonify({
             'user': user.to_dict(),
             'accessToken': access_token
@@ -57,7 +57,7 @@ def login():
     if not user or not user.verify_password(password):
         return jsonify({'error': 'Credenciales inválidas'}), 401
 
-    access_token = create_access_token(identity=user.id)
+    access_token = create_access_token(identity=str(user.id))
 
     response = jsonify({
         'message': 'Login exitoso',
@@ -76,3 +76,12 @@ def login():
     )
 
     return response, 200
+
+@auth_bp.route('/me', methods=['GET'])
+@jwt_required()
+def get_current_user():
+    user_id = get_jwt_identity()
+    user = User.query.get(user_id)
+    if not user:
+        return jsonify({'error': 'Usuario no encontrado'}), 404
+    return jsonify({'user': user.to_dict()}), 200
