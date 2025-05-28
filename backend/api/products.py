@@ -1,7 +1,6 @@
 # backend/api/products.py
 
 from flask import Blueprint, request, jsonify, abort
-from flask_jwt_extended import jwt_required, get_jwt, get_jwt_identity
 from backend.models import Product, User
 from backend.app import db
 
@@ -47,17 +46,6 @@ def get_product(product_id):
         return jsonify({"error": "Producto no encontrado"}), 404
     return jsonify(product.to_dict()), 200
 
-# Decorador para requerir rol admin
-def admin_required(fn):
-    from functools import wraps
-    @wraps(fn)
-    @jwt_required()
-    def wrapper(*args, **kwargs):
-        claims = get_jwt()
-        if claims.get("role") != "admin":
-            return jsonify({"error": "Solo administradores pueden realizar esta acción"}), 403
-        return fn(*args, **kwargs)
-    return wrapper
 
 @products_bp.route('/', methods=['POST'])
 @admin_required
