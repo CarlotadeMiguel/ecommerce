@@ -16,7 +16,7 @@ const ProductCard = ({ product }) => {
     // Pasar los datos del producto al contexto
     addItem(product.id, 1, {
       name: product.name,
-      price: product.price,
+      price: Number(product.price),
       image_url: product.image_url
     });
   };
