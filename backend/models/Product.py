@@ -14,7 +14,7 @@ class Product(db.Model):
     image_url = db.Column(db.String(255))
     is_active = db.Column(db.Boolean, default=True)
     created_at = db.Column(db.DateTime, default=db.func.current_timestamp())
-    order_items = db.relationship('OrderItem', backref='product', lazy=True)
+    order_items = db.relationship('OrderItem', back_populates='product', lazy=True)
 
     def __init__(self, name, price, **kwargs):
         if price <= 0:
