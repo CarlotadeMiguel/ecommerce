@@ -29,7 +29,7 @@ export function CartProvider({ children }) {
         product_id, 
         quantity, 
         name: product.name,
-        price: product.price,
+        price: Number(product.price),
         image_url: product.image_url 
       }];
     });
@@ -51,7 +51,10 @@ export function CartProvider({ children }) {
 
   const clearCart = () => setCart([]);
 
-  const subtotal = cart.reduce((sum, item) => sum + (item.price || 0) * item.quantity, 0);
+  const subtotal = cart.reduce(
+    (sum, item) => sum + (Number(item.price) || 0) * (Number(item.quantity) || 0),
+    0
+  );
   const iva = subtotal * 0.16;
   const total = subtotal + iva;
 
