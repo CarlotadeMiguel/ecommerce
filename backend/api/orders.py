@@ -1,11 +1,10 @@
-# backend/api/orders.py
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from backend.models import Order, OrderItem, Product, User
 from backend.app import db
+from decimal import Decimal
 
 orders_bp = Blueprint('orders', __name__)
-
 
 @orders_bp.route('/', methods=['GET'])
 @jwt_required()
@@ -17,16 +16,17 @@ def get_orders():
         order_data = {
             'id': order.id,
             'status': order.status,
-            'total': float(order.total_price),
+            'total': float(order.total_price or order.total or 0),
             'created_at': order.created_at.isoformat() if order.created_at else None,
             'items': []
         }
         for item in order.items:
             order_data['items'].append({
                 'product_id': item.product_id,
-                'quantity': item.quantity,
-                'price_at_purchase': float(item.price_at_purchase),
-                'subtotal': float(item.subtotal)
+                'quantity': item.quantity or 0,
+                'price_at_purchase': float(item.price_at_purchase or 0),
+                'subtotal': float(item.subtotal or 0),
+                'name': item.product.name if item.product else 'Nombre no disponible'
             })
         result.append(order_data)
     return jsonify(result), 200
@@ -46,22 +46,27 @@ def create_order():
             if not product or product.stock < item['quantity']:
                 raise ValueError(f"Producto {item['product_id']} no disponible")
             
+            price = product.price if product.price is not None else Decimal('0.00')
+            quantity = item['quantity'] if item['quantity'] is not None else 0
+            subtotal = price * quantity
+
             order_item = OrderItem(
                 order=order,
                 product_id=product.id,
-                quantity=item['quantity'],
-                price_at_purchase=product.price
+                quantity=quantity,
+                price_at_purchase=price,
+                subtotal=subtotal
             )
-            product.stock -= item['quantity']
+            product.stock -= quantity
             db.session.add(order_item)
         
-        order.calculate_total()
+        order.calculate_total() 
         db.session.commit()
         
         return jsonify({
             'message': 'Orden creada',
             'order_id': order.id,
-            'total': float(order.total)
+            'total': float(order.total or 0)
         }), 201
         
     except Exception as e:
@@ -79,11 +84,12 @@ def get_order(order_id):
     
     return jsonify({
         'id': order.id,
-        'total': float(order.total),
+        'total': float(order.total or 0),
         'status': order.status,
         'items': [{
             'product_id': item.product_id,
-            'quantity': item.quantity,
-            'price': float(item.price_at_purchase)
+            'quantity': item.quantity or 0,
+            'price': float(item.price_at_purchase or 0),
+            'name': item.product.name if item.product else 'Nombre no disponible'
         } for item in order.items]
     }), 200
