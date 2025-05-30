@@ -6,7 +6,7 @@ import CartSummary from "../components/cart/CartSummary";
 import {useNavigate} from "react-router-dom";
 
 const CartPage = () => {
-  const { cart, removeItem, updateQuantity, subtotal, iva, total, clearCart } = useContext(CartContext);
+  const { cart, removeItem, updateQuantity, subtotal, iva, total } = useContext(CartContext);
   const navigate = useNavigate();
   const handleCheckout = () => {
     if (cart.length === 0) {

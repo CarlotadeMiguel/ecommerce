@@ -1,10 +1,9 @@
-from flask import Blueprint, request, jsonify
+from flask import current_app, Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from backend.models import Order, OrderItem, Product, User
 from backend.app import db
-
 from decimal import Decimal
-# import stripe
+import stripe
 
 orders_bp = Blueprint('orders', __name__)
 
@@ -96,21 +95,18 @@ def get_order(order_id):
         } for item in order.items]
     }), 200
 
-# stripe.api_key = 'sk_test_default_key'  # Reemplaza con tu clave secreta de Stripe
-
-# @orders_bp.route('/create-payment-intent', methods=['POST'])
-# @jwt_required()
-# def create_payment_intent():
-#     try:
-#         data = request.get_json()
-#         amount = int(data['amount'] * 100)  # en centavos
-#         intent = stripe.PaymentIntent.create(
-#             amount=amount,
-#             currency='eur',  # o 'mxn', según tu mercado
-#             automatic_payment_methods={'enabled': True}
-#         )
-            
-#         return jsonify({'clientSecret': payment_intent.client_secret}), 200
-        
-#     except Exception as e:
-#         return jsonify({'error': str(e)}), 500
+@orders_bp.route('/create-payment-intent', methods=['POST'])
+@jwt_required()
+def create_payment_intent():
+    stripe.api_key = current_app.config['STRIPE_SECRET_KEY']
+    try:
+        data = request.get_json()
+        amount = int(data['amount'] * 100)  # Stripe espera centavos
+        intent = stripe.PaymentIntent.create(
+            amount=amount,
+            currency='eur',  # o 'mxn', según tu negocio
+            automatic_payment_methods={'enabled': True}
+        )
+        return jsonify({'clientSecret': intent.client_secret}), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500

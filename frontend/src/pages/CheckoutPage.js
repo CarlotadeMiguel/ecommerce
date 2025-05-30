@@ -1,14 +1,17 @@
-// src/pages/CheckoutPage.js
-
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CartContext } from '../context/CartContext';
 import { createOrder } from '../services/orders';
+import { Elements } from '@stripe/react-stripe-js';
+import { stripePromise } from '../services/stripe';
+import StripePaymentForm from '../components/checkout/StripePaymentForm';
+import api from '../services/api';
 
 const CheckoutPage = () => {
   const { cart, clearCart, total } = useContext(CartContext);
   const navigate = useNavigate();
   const [isProcessing, setIsProcessing] = useState(false);
+  const [clientSecret, setClientSecret] = useState(null);
   const [shippingInfo, setShippingInfo] = useState({
     name: '',
     address: '',
@@ -17,28 +20,27 @@ const CheckoutPage = () => {
     country: 'España'
   });
 
+  // Solicita el clientSecret al backend cuando el carrito o el total cambian
+  useEffect(() => {
+    if (cart.length > 0 && total > 0) {
+      api.post('/orders/create-payment-intent', { amount: total })
+        .then(res => setClientSecret(res.data.clientSecret))
+        .catch(() => alert('Error al inicializar el pago'));
+    }
+  }, [cart, total]);
+
   // Maneja cambios en el formulario de envío
   const handleInputChange = (e) => {
     setShippingInfo({ ...shippingInfo, [e.target.name]: e.target.value });
   };
 
-  // Maneja el envío del checkout
-  const handleCheckout = async () => {
-    if (cart.length === 0) {
-      alert("¡Tu carrito está vacío!");
-      return;
-    }
-    // Validación básica de formulario
-    if (!shippingInfo.name || !shippingInfo.address || !shippingInfo.city || !shippingInfo.postalCode) {
-      alert("Por favor, completa todos los campos de envío.");
-      return;
-    }
-
+  // Lógica tras pago exitoso con Stripe
+  const handleCheckoutSuccess = async (paymentIntent) => {
     setIsProcessing(true);
     try {
-      // Estructura de la orden para el backend
       const orderData = {
         shipping: shippingInfo,
+        payment_intent: paymentIntent.id,
         items: cart.map(item => ({
           product_id: item.product_id,
           quantity: item.quantity,
@@ -47,7 +49,6 @@ const CheckoutPage = () => {
           image_url: item.image_url
         }))
       };
-
       await createOrder(orderData);
       clearCart();
       navigate('/orders');
@@ -65,7 +66,7 @@ const CheckoutPage = () => {
         {/* Formulario de envío */}
         <div className="bg-white p-6 rounded-lg shadow-md">
           <h3 className="text-lg font-semibold mb-4">Datos de Envío</h3>
-          <form className="space-y-4" onSubmit={e => { e.preventDefault(); handleCheckout(); }}>
+          <form className="space-y-4" onSubmit={e => e.preventDefault()}>
             <div>
               <label className="block text-sm font-medium mb-1">Nombre completo</label>
               <input
@@ -125,17 +126,10 @@ const CheckoutPage = () => {
                 <option>Estados Unidos</option>
               </select>
             </div>
-            <button
-              type="submit"
-              disabled={isProcessing}
-              className={`w-full bg-blue-600 text-white py-3 rounded-lg transition ${isProcessing ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-700'}`}
-            >
-              {isProcessing ? 'Procesando...' : 'Confirmar Pago'}
-            </button>
           </form>
         </div>
 
-        {/* Resumen de compra */}
+        {/* Resumen de compra y pago */}
         <div className="bg-white p-6 rounded-lg shadow-md">
           <h3 className="text-lg font-semibold mb-4">Resumen de Compra</h3>
           {cart.map(item => (
@@ -161,6 +155,20 @@ const CheckoutPage = () => {
               <span className="font-semibold">Total:</span>
               <span className="text-xl font-bold">${total.toFixed(2)}</span>
             </div>
+          </div>
+          {/* Stripe Elements para pago */}
+          <div className="mt-6">
+            {clientSecret && (
+              <Elements stripe={stripePromise} options={{ clientSecret }}>
+                <StripePaymentForm
+                  total={total}
+                  shippingInfo={shippingInfo}
+                  cart={cart}
+                  onSuccess={handleCheckoutSuccess}
+                  isProcessing={isProcessing}
+                />
+              </Elements>
+            )}
           </div>
         </div>
       </div>

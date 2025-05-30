@@ -33,6 +33,7 @@ class ProductionConfig(Config):
     SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URI')
     JWT_ACCESS_TOKEN_EXPIRES = 3600  # 1 hora de expiración
     SESSION_COOKIE_SECURE = True
+    STRIPE_SECRET_KEY = os.getenv('STRIPE_SECRET_KEY')
 
 def get_config():
     """Seleccionar configuración basada en entorno"""
