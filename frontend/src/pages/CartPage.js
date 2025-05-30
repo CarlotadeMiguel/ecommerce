@@ -1,26 +1,19 @@
 // src/pages/CartPage.js
 import React, { useContext } from "react";
 import { CartContext } from "../context/CartContext";
-import { createOrder } from "../services/orders";
 import CartItem from "../components/cart/CartItem";
 import CartSummary from "../components/cart/CartSummary";
+import {useNavigate} from "react-router-dom";
 
 const CartPage = () => {
   const { cart, removeItem, updateQuantity, subtotal, iva, total, clearCart } = useContext(CartContext);
-
-  const handleCheckout = async () => {
-    try {
-      const orderData = {
-        items: cart.map(item => ({
-          product_id: item.product_id,
-          quantity: item.quantity
-        }))
-      };
-      await createOrder(orderData);
-      clearCart();
-    } catch (error) {
-      alert('Error al procesar la orden');
+  const navigate = useNavigate();
+  const handleCheckout = () => {
+    if (cart.length === 0) {
+      alert("¡Tu carrito está vacío!");
+      return;
     }
+    navigate('/checkout');
   };
 
   return (

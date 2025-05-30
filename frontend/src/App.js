@@ -7,6 +7,7 @@ import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import CartPage from "./pages/CartPage";
 import OrdersPage from "./pages/OrdersPage";
+import CheckoutPage from "./pages/CheckoutPage";
 import Header from "./components/common/Header";
 import MiniCart from "./components/cart/MiniCart";
 
@@ -31,6 +32,11 @@ function App() {
           <Route path="/orders" element={
             <PrivateRoute>
               <OrdersPage />
+            </PrivateRoute>
+          } />
+            <Route path="/checkout" element={
+            <PrivateRoute>
+              <CheckoutPage />
             </PrivateRoute>
           } />
         </Routes>

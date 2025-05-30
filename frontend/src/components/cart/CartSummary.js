@@ -19,7 +19,7 @@ const CartSummary = ({ subtotal, iva, total, onCheckout }) => (
       onClick={onCheckout}
       className="w-full bg-green-600 text-white mt-4 py-2 rounded hover:bg-green-700"
     >
-      Proceder al checkout
+      Finalizar Compra
     </button>
   </div>
 );
