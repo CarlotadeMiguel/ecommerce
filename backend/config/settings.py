@@ -25,6 +25,7 @@ class DevelopmentConfig(Config):
     RESTX_MASK_SWAGGER = False
     PAGE_SIZE = 10
     MAX_PAGE_SIZE = 100
+    STRIPE_SECRET_KEY = os.getenv('STRIPE_SECRET_KEY', 'sk_test_default_key')
 
 class ProductionConfig(Config):
     """Configuración para entorno de producción"""
