@@ -1,3 +1,4 @@
+// src/pages/CheckoutPage.js
 import React, { useContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CartContext } from '../context/CartContext';
@@ -12,6 +13,8 @@ const CheckoutPage = () => {
   const navigate = useNavigate();
   const [isProcessing, setIsProcessing] = useState(false);
   const [clientSecret, setClientSecret] = useState(null);
+  const [formTouched, setFormTouched] = useState(false);
+  const [formErrors, setFormErrors] = useState({});
   const [shippingInfo, setShippingInfo] = useState({
     name: '',
     address: '',
@@ -20,7 +23,21 @@ const CheckoutPage = () => {
     country: 'España'
   });
 
-  // Solicita el clientSecret al backend cuando el carrito o el total cambian
+  // Validación de campos de envío
+  const validateShipping = (fields = shippingInfo) => {
+    const errors = {};
+    if (!fields.name.trim()) errors.name = "El nombre es obligatorio";
+    if (!fields.address.trim()) errors.address = "La dirección es obligatoria";
+    if (!fields.city.trim()) errors.city = "La ciudad es obligatoria";
+    if (!fields.postalCode.trim()) errors.postalCode = "El código postal es obligatorio";
+    if (!fields.country.trim()) errors.country = "El país es obligatorio";
+    return errors;
+  };
+
+  useEffect(() => {
+    if (formTouched) setFormErrors(validateShipping());
+  }, [shippingInfo, formTouched]);
+
   useEffect(() => {
     if (cart.length > 0 && total > 0) {
       api.post('/orders/create-payment-intent', { amount: total })
@@ -29,12 +46,11 @@ const CheckoutPage = () => {
     }
   }, [cart, total]);
 
-  // Maneja cambios en el formulario de envío
   const handleInputChange = (e) => {
     setShippingInfo({ ...shippingInfo, [e.target.name]: e.target.value });
+    setFormTouched(true);
   };
 
-  // Lógica tras pago exitoso con Stripe
   const handleCheckoutSuccess = async (paymentIntent) => {
     setIsProcessing(true);
     try {
@@ -59,6 +75,8 @@ const CheckoutPage = () => {
     }
   };
 
+  const isFormValid = Object.keys(validateShipping()).length === 0;
+
   return (
     <div className="container mx-auto py-8">
       <h2 className="text-2xl font-bold mb-6">Confirmar Compra</h2>
@@ -74,9 +92,10 @@ const CheckoutPage = () => {
                 name="name"
                 value={shippingInfo.name}
                 onChange={handleInputChange}
-                className="w-full p-2 border rounded-md"
+                className={`w-full p-2 border rounded-md ${formErrors.name ? 'border-red-500' : ''}`}
                 required
               />
+              {formTouched && formErrors.name && <p className="text-red-500 text-xs">{formErrors.name}</p>}
             </div>
             <div>
               <label className="block text-sm font-medium mb-1">Dirección</label>
@@ -97,9 +116,10 @@ const CheckoutPage = () => {
                   name="city"
                   value={shippingInfo.city}
                   onChange={handleInputChange}
-                  className="w-full p-2 border rounded-md"
+                  className={`w-full p-2 border rounded-md ${formErrors.city ? 'border-red-500' : ''}`}
                   required
                 />
+                {formTouched && formErrors.city && <p className="text-red-500 text-xs">{formErrors.city}</p>}
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1">Código Postal</label>
@@ -108,9 +128,10 @@ const CheckoutPage = () => {
                   name="postalCode"
                   value={shippingInfo.postalCode}
                   onChange={handleInputChange}
-                  className="w-full p-2 border rounded-md"
+                  className={`w-full p-2 border rounded-md ${formErrors.postalCode ? 'border-red-500' : ''}`}
                   required
                 />
+                {formTouched && formErrors.postalCode && <p className="text-red-500 text-xs">{formErrors.postalCode}</p>}
               </div>
             </div>
             <div>
@@ -119,12 +140,13 @@ const CheckoutPage = () => {
                 name="country"
                 value={shippingInfo.country}
                 onChange={handleInputChange}
-                className="w-full p-2 border rounded-md"
+                className={`w-full p-2 border rounded-md ${formErrors.country ? 'border-red-500' : ''}`}
               >
                 <option>España</option>
                 <option>México</option>
                 <option>Estados Unidos</option>
               </select>
+              {formTouched && formErrors.country && <p className="text-red-500 text-xs">{formErrors.country}</p>}
             </div>
           </form>
         </div>
@@ -166,8 +188,14 @@ const CheckoutPage = () => {
                   cart={cart}
                   onSuccess={handleCheckoutSuccess}
                   isProcessing={isProcessing}
+                  disabled={!isFormValid}
                 />
               </Elements>
+            )}
+            {!isFormValid && (
+              <div className="text-red-500 text-sm mt-2">
+                Por favor, completa todos los campos de envío antes de pagar.
+              </div>
             )}
           </div>
         </div>
